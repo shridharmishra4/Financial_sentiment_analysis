@@ -24,31 +24,40 @@
 
 from lxml import html
 import requests
+import re
 
 
-syn={}
-notfound=[]
+syn={}						#dictionary of each word with word as key and synonyms as its key elements
+notfound=[]					#list of words not found in synonyms.com
 
 
 
 
 def getsyn(word):
+	synonyms=[]				#list of synonyms for each word with search word as key
 	
-	page = requests.get('http://www.synonym.com/synonyms/%s/'% word)
-	tree = html.fromstring(page.text)
+	page = requests.get('http://www.synonym.com/synonyms/%s/'% word)#gets html of page
+	tree = html.fromstring(page.text)#forms a tree of html
 	#print page
 
 
-	synon = tree.xpath('//span[@class="equals"]/text()')
+	synon = tree.xpath('//span[@class="equals"]/text()') #fetch the required element from its xpath
 	
-	#print synon
-	#print len(synon)
+	
 	if len(synon)==0:
 		notfound.append(word)
 	#print notfound
 		
 	try:
-		syn.update({word:synon[0]})
+		#synonyms.append(re.sub(r'\(.*?\)', '',synon.split(',',[0])))
+		synonyms.extend(re.sub(r'\(.*?\)', '',synon.split(',',[0])))
+		"""
+		Test append and extend
+		"""
+		print synonyms[0]
+		
+		syn.update({word:synon})
+		#syn.update({word:synon[0]})
 		#print syn
 	
 	
@@ -56,21 +65,35 @@ def getsyn(word):
 		pass
 
 
+def write2file():
+    f = open ('synonymdict.txt', 'w')
+    f.write(str(syn))
+    f.close()
+    
+    
+    
 
+
+def openfile():
+    h = open('synonymdict.txt', 'r')
+    newdict = eval(h.read())
+    print newdict
+    print len(newdict)
+    h.close()  
 
 def main():
-	f = open('test.txt')
-	#lines = f.readlines()
-	lines = [line.strip() for line in open('test.txt')]
-	for i in lines:
+	#f = open('test.txt')
+	##lines = f.readlines()
+	#lines = [line.strip() for line in open('test.txt')]
+	#for i in lines:
 
 
-		getsyn('%s' % i)
+		#getsyn('%s' % i)
 	
 	
-	f.close()
-	#getsyn("angry")
-	print syn
+	#f.close()
+	getsyn("angry")
+	#print syn
 	print notfound
 	
 	
