@@ -1,0 +1,1 @@
+{'accessible': ['approachable', ' reachable', 'come-at-able', ' get-at-able', ' getatable'], 'abundant': ['abounding', ' galore', 'ample', ' copious', ' plenteous', ' plentiful', ' rich'], 'abound': ['be', 'have', ' feature'], 'abounds': ['be', 'have', ' feature']}

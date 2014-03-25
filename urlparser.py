@@ -29,12 +29,17 @@ import re
 
 syn={}						#dictionary of each word with word as key and synonyms as its key elements
 notfound=[]					#list of words not found in synonyms.com
+count=0
+
 
 
 
 
 def getsyn(word):
+	global count
+	#print "function initiated"
 	synonyms=[]				#list of synonyms for each word with search word as key
+	withoutbracket=''
 	
 	page = requests.get('http://www.synonym.com/synonyms/%s/'% word)#gets html of page
 	tree = html.fromstring(page.text)#forms a tree of html
@@ -46,27 +51,28 @@ def getsyn(word):
 	
 	if len(synon)==0:
 		notfound.append(word)
-	#print notfound
-		
-	try:
-		#synonyms.append(re.sub(r'\(.*?\)', '',synon.split(',',[0])))
-		synonyms.extend(re.sub(r'\(.*?\)', '',synon.split(',',[0])))
-		"""
-		Test append and extend
-		"""
-		print synonyms[0]
-		
-		syn.update({word:synon})
-		#syn.update({word:synon[0]})
-		#print syn
-	
-	
-	except IndexError:
+		count = count+1
 		pass
+	#print notfound
+	else:	
+		try:
+			count =count+1
+			
+			for items in synon[0:2]:
+				synonyms.extend((removebracket(items).split(",")))
+			
+			syn.update({word:synonyms})
+			#syn.update({word:synon[0]})
+			#print syn
+			print count,"  ",(count/2007.0)
+		
+		
+		except IndexError:
+			pass
 
 
 def write2file():
-    f = open ('synonymdict.txt', 'w')
+    f = open ('/home/shridhar/Financial_sentiment_analysis/txtfiles/positivesyndict.txt', 'w')
     f.write(str(syn))
     f.close()
     
@@ -75,27 +81,31 @@ def write2file():
 
 
 def openfile():
-    h = open('synonymdict.txt', 'r')
+    h = open('positivesyndict.txt', 'r')
     newdict = eval(h.read())
     print newdict
     print len(newdict)
     h.close()  
+    
+def removebracket(word):
+	return re.sub(r'\(.*?\)', '',word)
+	
 
 def main():
-	#f = open('test.txt')
-	##lines = f.readlines()
-	#lines = [line.strip() for line in open('test.txt')]
-	#for i in lines:
-
-
-		#getsyn('%s' % i)
+	filename = open('/home/shridhar/Financial_sentiment_analysis/txtfiles/positive.txt')
+	lines = [line.strip() for line in filename]
 	
 	
-	#f.close()
-	getsyn("angry")
-	#print syn
+	for i in lines:
+		getsyn('%s' % i)
+	filename.close()
+	write2file()
+	#getsyn("angry")
+	print syn
 	print notfound
-	
+	#print len(syn)
+	#print len(notfound)
+	#print counter
 	
 	
 	return 0
